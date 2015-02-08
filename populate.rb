@@ -203,7 +203,7 @@ class JqueryDocPopulator
           out.write(",\n")
         end
 
-        out.write(output_doc.to_json)
+        out.write(JSON.pretty_generate(output_doc))
       end
     end
   end
