@@ -1,0 +1,6 @@
+out/
+.idea/
+
+jquery_doc.json
+jquery_doc.json.bz2
+*~
