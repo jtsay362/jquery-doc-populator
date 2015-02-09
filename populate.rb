@@ -216,7 +216,8 @@ class JqueryDocPopulator
   end
 end
 
-DOWNLOAD_PATH = './out'
+DOWNLOAD_PATH = './downloaded'
+OUTPUT_PATH = './out'
 REMOTE_GIT_URL = 'https://github.com/jquery/api.jquery.com'
 input_path = File.join(DOWNLOAD_PATH, 'api.jquery.com')
 is_input_path_explicit = nil
@@ -237,9 +238,14 @@ end
 
 puts "input_path = #{input_path}"
 
-FileUtils.mkdir_p("out")
+unless File.exist?(OUTPUT_PATH)
+  FileUtils.mkdir_p(OUTPUT_PATH)
+end
 
 if download
+  unless File.exist?(DOWNLOAD_PATH)
+    FileUtils.mkdir_p(DOWNLOAD_PATH)
+  end
   system("cd #{DOWNLOAD_PATH}; git clone #{REMOTE_GIT_URL}")
 end
 
