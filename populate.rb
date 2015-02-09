@@ -209,20 +209,32 @@ class JqueryDocPopulator
   end
 end
 
-input_path = nil
+DOWNLOAD_PATH = './out'
+REMOTE_GIT_URL = 'https://github.com/jquery/api.jquery.com'
+input_path = File.join(DOWNLOAD_PATH, 'api.jquery.com')
+is_input_path_explicit = nil
 output_filename = 'jquery_doc.json'
+download = true
 
 ARGV.each do |arg|
-  if input_path
+  if arg == '-d'
+    download = true
+    input_path = File.join(DOWNLOAD_PATH, 'api.jquery.com')
+  elsif is_input_path_explicit
     output_filename = arg
   else
     input_path = arg
+    is_input_path_explicit = true
   end
 end
 
 puts "input_path = #{input_path}"
 
 FileUtils.mkdir_p("out")
+
+if download
+  system("cd #{DOWNLOAD_PATH}; git clone #{REMOTE_GIT_URL}")
+end
 
 populator = JqueryDocPopulator.new(input_path, output_filename)
 
