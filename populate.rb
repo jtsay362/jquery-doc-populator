@@ -157,7 +157,8 @@ class JqueryDocPopulator
   def parse_entry_file(out, filename)
     File.open(filename) do |f|
       doc = Nokogiri::XML(f)
-
+      # slideUp and others use xinclude for common parameters
+      doc.do_xinclude
       doc.css('entry').each do |entry|
         kind = entry.attr('type').strip
 
