@@ -29,6 +29,10 @@ class JqueryDocPopulator
           "type" : "string",
           "index" : "analyzed"
         },
+        "shortName" : {
+          "type" : "string",
+          "index" : "analyzed"
+        },
         "title" : {
           "type" : "string",
           "index" : "analyzed"
@@ -166,8 +170,10 @@ class JqueryDocPopulator
 
         url = ('https://api.jquery.com/' + File.basename(filename)).gsub(/\.xml$/, '/')
 
+        name = entry.attr('name').strip
         output_doc = {
-          name: entry.attr('name').strip,
+          name: name,
+          shortName: name.gsub(/.+\.(\w+)$/, '\1'),
           url: url,
           title: (entry > 'title').text.strip,
           kind: entry.attr('type').strip,
