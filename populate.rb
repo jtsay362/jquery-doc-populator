@@ -20,6 +20,24 @@ class JqueryDocPopulator
       out.write <<-eos
 {
   "metadata" : {
+    "settings" : {
+      "analysis": {
+        "char_filter" : {
+          "no_special" : {
+            "type" : "mapping",
+            "mappings" : ["$=>", ".=>", "(=>", ")=>"]
+          }
+        },
+        "analyzer" : {
+          "lower_whitespace" : {
+            "type" : "custom",
+            "tokenizer": "whitespace",
+            "filter" : ["lowercase"],
+            "char_filter" : ["no_special"]
+          }
+        }
+      }
+    },
     "mapping" : {
       "_all" : {
         "enabled" : false
@@ -27,15 +45,15 @@ class JqueryDocPopulator
       "properties" : {
         "name" : {
           "type" : "string",
-          "index" : "analyzed"
+          "analyzer" : "lower_whitespace"
         },
         "shortName" : {
           "type" : "string",
-          "index" : "analyzed"
+          "analyzer" : "lower_whitespace"
         },
         "title" : {
           "type" : "string",
-          "index" : "analyzed"
+          "analyzer" : "lower_whitespace"
         },
         "kind" : {
           "type" : "string",
@@ -76,6 +94,14 @@ class JqueryDocPopulator
         "examples" : {
           "type" : "object",
           "enabled" : false
+        },
+        "categories" : {
+          "type" : "string",
+          "analyzer" : "lower_whitespace"
+        },
+        "suggest" : {
+          "type" : "completion",
+          "analyzer" : "lower_whitespace"
         }
       }
     }
@@ -171,9 +197,17 @@ class JqueryDocPopulator
         url = ('https://api.jquery.com/' + File.basename(filename)).gsub(/\.xml$/, '/')
 
         name = entry.attr('name').strip
+        short_name = name.gsub(/.+\.(\w+)$/, '\1')
+
+        suggest_inputs = [name]
+
+        if short_name != name
+          suggest_inputs << short_name
+        end
+
         output_doc = {
           name: name,
-          shortName: name.gsub(/.+\.(\w+)$/, '\1'),
+          shortName: short_name,
           url: url,
           title: (entry > 'title').text.strip,
           kind: entry.attr('type').strip,
@@ -201,6 +235,10 @@ class JqueryDocPopulator
           categories: (entry > 'category').map do |category|
             category.attr('slug')
           end,
+          suggest: {
+            input: suggest_inputs,
+            output: name
+          },
           recognitionKeys: [compute_recognition_key(kind)]
         }
 
